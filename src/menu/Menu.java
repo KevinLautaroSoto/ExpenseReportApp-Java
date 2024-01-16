@@ -77,6 +77,8 @@ public class Menu {
     }
 
     public static void Option5(List<ExpenseCategory> expenseCategoryList, List<Expense> expenseList) {
+        Scanner scanner = new Scanner(System.in);
+
         int countDescAux = 1;
         int cont = 1;
         System.out.println("Elija la categoria del filtro: ");
@@ -85,7 +87,9 @@ public class Menu {
             countDescAux++;
         }
 
-        CategoryFilter categoryFilter = new CategoryFilter(expenseCategoryList.get(countDescAux - 1).getName());
+        int descAux = scanner.nextInt();
+
+        CategoryFilter categoryFilter = new CategoryFilter(expenseCategoryList.get(descAux - 1).getName());
 
         for (Expense expense : expenseList) {
             if(categoryFilter.cumpleFiltro(expense)) {
