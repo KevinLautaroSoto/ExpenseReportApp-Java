@@ -1,4 +1,4 @@
-import Menu.Menu;
+import menu.Menu;
 import entities.Expense;
 import entities.ExpenseCategory;
 import implementations.ExpenseCalculatorImplementation;
