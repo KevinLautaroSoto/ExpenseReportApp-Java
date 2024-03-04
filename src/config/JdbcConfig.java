@@ -14,10 +14,42 @@ public class JdbcConfig {
         Connection connection = null;
 
         try {
+            Class.forName(DB_DRIVER);
             connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
         return connection;
     }
+
+    public static void createTable() {
+
+        try (Connection conn = getConnection()){
+
+            String createCategoryExpenseTableSql = "CREATE TABLE IF NOT EXISTS CATEGORY_EXPENSES(" +
+                    "id INT AUTO_INCREMENT PRIMARY KEY," +
+                    "name VARCHAR(255));";
+            try (var stmtCategoryExpense = conn.createStatement()) {
+                stmtCategoryExpense.executeUpdate(createCategoryExpenseTableSql);
+                System.out.println("Table CATEGORY_EXPENSES crated successfully");
+            }
+
+            String createExpenseTableSql = "CREATE TABLE IF NOT EXISTS EXPENSES(" + //Primary key, monto, descripcion, categoria y fecha
+                    "id INT AUTO_INCREMENT PRIMARY KEY," +
+                    "amount VARCHAR(20)," +
+                    "description VARCHAR(255)," +
+                    "category_id INT," + //FOREIGN KEY referencing CATEGORY_EXPENSES
+                    "date VARCHAR(50)," +
+                    "FOREIGN KEY (category_id) REFERENCES CATEGORY_EXPENSES (id));"; //defining foreing key contraint
+            try (var stmtExpense = conn.createStatement()){
+                stmtExpense.executeUpdate(createExpenseTableSql);
+                System.out.println("Table EXPENSES created successfully");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
+
+//Tablas Expenses CategoryExpenses

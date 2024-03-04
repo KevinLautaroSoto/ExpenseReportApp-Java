@@ -6,7 +6,6 @@ public class Expense {
     private double amount;
     private String description;
     private ExpenseCategory category;
-
     private String date;
 
     public Expense() {

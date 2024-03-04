@@ -3,13 +3,16 @@ import entities.Expense;
 import entities.ExpenseCategory;
 import implementations.ExpenseCalculatorImplementation;
 import interfaces.ExpenseCalculator;
-import java.util.List;
+import config.JdbcConfig;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+
+        JdbcConfig.createTable();// Crea las tablas en la base de datos de H2.
 
         ExpenseCalculator expenseCalculator = new ExpenseCalculatorImplementation();
 
