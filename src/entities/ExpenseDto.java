@@ -1,24 +1,20 @@
 package entities;
 
-public class Expense {
-    //Gastos: monto, descripcion, categoria y fecha
-
+public class ExpenseDto {
     private int id;
     private double amount;
     private String description;
     private ExpenseCategory category;
     private String date;
 
-    public Expense() {
-    }
+    public ExpenseDto() {}
 
-    public Expense(double amount, String description, ExpenseCategory category, String date) {
+    public ExpenseDto(double amount, String description, ExpenseCategory category, String date) {
         this.amount = amount;
         this.description = description;
         this.category = category;
         this.date = date;
     }
-
 
     public int getId() {
         return id;
@@ -58,15 +54,5 @@ public class Expense {
 
     public void setDate(String date) {
         this.date = date;
-    }
-
-    @Override
-    public String toString() {
-        return "Expense{" +
-                "amount=" + amount +
-                ", description='" + description + '\'' +
-                ", category=" + category +
-                ", date='" + date + '\'' +
-                '}';
     }
 }

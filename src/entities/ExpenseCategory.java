@@ -1,6 +1,7 @@
 package entities;
 
 public class ExpenseCategory {
+    private int id;
     private String name;
 
     public ExpenseCategory() {
@@ -18,10 +19,19 @@ public class ExpenseCategory {
         this.name = name;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "ExpenseCategory{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 '}';
     }
 }

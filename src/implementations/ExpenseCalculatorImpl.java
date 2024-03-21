@@ -4,7 +4,7 @@ import entities.Expense;
 import interfaces.ExpenseCalculator;
 import java.util.List;
 
-public class ExpenseCalculatorImplementation implements ExpenseCalculator {
+public class ExpenseCalculatorImpl implements ExpenseCalculator {
     @Override
     public double calculateExpense(Expense expense) {return expense.getAmount();}
 
