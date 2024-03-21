@@ -1,7 +1,8 @@
-import menu.Menu;
+import implementations.MenuCRUDImpl;
+import menu.MenuCRUD;
 import entities.Expense;
 import entities.ExpenseCategory;
-import implementations.ExpenseCalculatorImplementation;
+import implementations.ExpenseCalculatorImpl;
 import interfaces.ExpenseCalculator;
 import config.JdbcConfig;
 
@@ -14,7 +15,9 @@ public class Main {
 
         JdbcConfig.createTable();// Crea las tablas en la base de datos de H2.
 
-        ExpenseCalculator expenseCalculator = new ExpenseCalculatorImplementation();
+        ExpenseCalculator expenseCalculator = new ExpenseCalculatorImpl();
+
+        MenuCRUD menuCRUD = new MenuCRUDImpl();
 
         List<Expense> expenseList = new ArrayList<>(); //Lista que almacenara todos los gastos
         List<ExpenseCategory> expenseCategoryList = new ArrayList<>();
@@ -28,14 +31,29 @@ public class Main {
         int countExpense = 2;
 
         do {
-            System.out.println("MENU:");
+            /*System.out.println("MENU:");
             System.out.println("1- Lista de Gastos.");
             System.out.println("2- Ingresar nuevo Gasto.");
             System.out.println("3- Lista de Categorias de Gastos.");
             System.out.println("4- Ingresar nueva Categoria de Gasto.");
             System.out.println("5- Filtrar Gastos por categoria.");
             System.out.println("9- Salir.");
-            System.out.println(" ");
+            System.out.println(" "); */
+
+            //Nuevo menu:
+            System.out.println("""
+                            MENU:\s
+                             1- Lista de Gastos.
+                             2- Crear nuevo Gasto.
+                             3- Actualizar un Gasto.
+                             4- Eliminar un Gasto.
+                             5- Lista de categorias de Gastos.
+                             6- Crear nueva categoria de Gasto.
+                             7- Actualizar una categoria de Gasto.
+                             8- Eliminar una categoria de Gasto.
+                             9- Filtrar Gastos por categoria.
+                             10- Salir.""" +
+                    "\n------------------------------------------------------------------------------\n");
 
             System.out.print("Ingrese la opcion: ");
             option = scanner.nextInt();
@@ -43,27 +61,44 @@ public class Main {
             //un Switch para que se ejecuten distintos codigos segun que vaya eligiendo el usuario en consola.
             switch (option) {
                 case 1:
-                    Menu.option1(expenseList);
+                    //Menu.option1(expenseList); Esta es la manera sin el CRUD ni la base de datos.
+                    menuCRUD.option1();
                     System.out.println(" ");
                     break;
                 case 2:
-                    Menu.option2(expenseList, expenseCategoryList, countExpense);
+                    //Menu.option2(expenseList, expenseCategoryList, countExpense);
+                    menuCRUD.option2();
                     break;
                 case 3:
-                    Menu.Option3(expenseCategoryList);
+                    menuCRUD.option3();
                     break;
                 case 4:
-                    Menu.Option4(expenseCategoryList);
+                    menuCRUD.option4();
                     break;
                 case 5:
-                    Menu.Option5(expenseCategoryList, expenseList);
+                    //Menu.Option3(expenseCategoryList);
+                    menuCRUD.option5();
+                    break;
+                case 6:
+                    //Menu.Option4(expenseCategoryList);
+                    menuCRUD.option6();
+                    break;
+                case 7:
+                    menuCRUD.option7();
+                    break;
+                case 8:
+                    menuCRUD.option8();
                     break;
                 case 9:
+                    //Menu.Option5(expenseCategoryList, expenseList);
+                    menuCRUD.option9();
+                    break;
+                case 10:
                     System.out.println("Saliendo del sistema...");
                     break;
             }
 
-        }while(option != 9);
+        }while(option != 10);
 
 
     }

@@ -6,7 +6,6 @@ import implementations.CategoryFilter;
 import interfaces.PrintableList;
 import utilities.Utilities;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 

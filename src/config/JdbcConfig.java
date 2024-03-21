@@ -17,7 +17,7 @@ public class JdbcConfig {
             Class.forName(DB_DRIVER);
             connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return connection;
     }
@@ -26,7 +26,7 @@ public class JdbcConfig {
 
         try (Connection conn = getConnection()){
 
-            String createCategoryExpenseTableSql = "CREATE TABLE IF NOT EXISTS CATEGORY_EXPENSES(" +
+            String createCategoryExpenseTableSql = "CREATE TABLE IF NOT EXISTS EXPENSE_CATEGORY(" +
                     "id INT AUTO_INCREMENT PRIMARY KEY," +
                     "name VARCHAR(255));";
             try (var stmtCategoryExpense = conn.createStatement()) {
@@ -40,13 +40,13 @@ public class JdbcConfig {
                     "description VARCHAR(255)," +
                     "category_id INT," + //FOREIGN KEY referencing CATEGORY_EXPENSES
                     "date VARCHAR(50)," +
-                    "FOREIGN KEY (category_id) REFERENCES CATEGORY_EXPENSES (id));"; //defining foreing key contraint
+                    "FOREIGN KEY (category_id) REFERENCES EXPENSE_CATEGORY (id));"; //defining foreing key contraint
             try (var stmtExpense = conn.createStatement()){
                 stmtExpense.executeUpdate(createExpenseTableSql);
                 System.out.println("Table EXPENSES created successfully");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
