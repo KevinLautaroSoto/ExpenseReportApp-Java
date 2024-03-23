@@ -17,8 +17,16 @@ import java.util.List;
 import java.util.Locale;
 
 public class ExpenseDaoImpl implements ExpenseDAO {
-    private final Connection connection = JdbcConfig.getConnection();
-    private final ExpenseCategoryDAO expenseCategoryDao = new ExpenseCategoryDaoImpl();
+    private Connection connection = JdbcConfig.getConnection();
+    private ExpenseCategoryDAO expenseCategoryDao = new ExpenseCategoryDaoImpl();
+
+    public ExpenseDaoImpl(){}
+
+    public ExpenseDaoImpl(Connection connection, ExpenseCategoryDAO expenseCategoryDAO) {
+        this.connection = connection;
+        this.expenseCategoryDao = expenseCategoryDAO;
+    }
+
     @Override
     public void insert(ExpenseDto expenseDto) {
         String sqlInsert = "INSERT INTO EXPENSES (amount, description, category_id, date) VALUES (?, ?, ?, ?)";

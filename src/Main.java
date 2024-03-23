@@ -5,10 +5,12 @@ import entities.ExpenseCategory;
 import implementations.ExpenseCalculatorImpl;
 import interfaces.ExpenseCalculator;
 import config.JdbcConfig;
+import org.junit.jupiter.api.DisplayName;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
