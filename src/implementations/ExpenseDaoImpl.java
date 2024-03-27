@@ -7,6 +7,8 @@ import entities.ExpenseDto;
 import interfaces.ExpenseDAO;
 import implementations.ExpenseCategoryDaoImpl;
 import interfaces.ExpenseCategoryDAO;
+import interfaces.Utilities;
+import utilities.UtilitiesImpl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -113,13 +115,15 @@ public class ExpenseDaoImpl implements ExpenseDAO {
                 expense.setDate(date);
 
                 System.out.println("The expense was found successfully.");
+                return expense;
             } else {
                 System.out.println("There is no match for that id.");
+                return null;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null;
+
     }
 
     @Override
@@ -163,6 +167,7 @@ public class ExpenseDaoImpl implements ExpenseDAO {
 
     @Override
     public void update(Expense expense) {
+        UtilitiesImpl utilities = new UtilitiesImpl();
         String sqlUpdate = "UPDATE EXPENSES SET amount = ?, description = ?, category_id = ?, date = ? WHERE id = ?";
 
         try{
@@ -176,9 +181,9 @@ public class ExpenseDaoImpl implements ExpenseDAO {
             int updateComplete = preparedStatement.executeUpdate();
 
             if (updateComplete > 0) {
-                System.out.println("The update was successfully loaded.");
+                  utilities.consoleLoger("The update was successfully loaded.");
             } else {
-                System.out.println("The update couldn´t be completed.");
+                utilities.consoleLoger("The update couldn´t be completed.");
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

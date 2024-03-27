@@ -3,8 +3,8 @@ package menu;
 import entities.Expense;
 import entities.ExpenseCategory;
 import implementations.CategoryFilter;
-import interfaces.PrintableList;
-import utilities.Utilities;
+import interfaces.Utilities;
+import utilities.UtilitiesImpl;
 
 import java.util.List;
 import java.util.Scanner;
@@ -14,7 +14,7 @@ public class Menu {
         System.out.println("Lista de gastos: ");
 
         //llamo al utilities encargado de imprimir las listas. Hecho para practicar generics.
-        PrintableList<Expense> expensePrinter = new Utilities<>();
+        Utilities<Expense> expensePrinter = new UtilitiesImpl<>();
         expensePrinter.printList(expenseList);
     }
 
@@ -26,7 +26,7 @@ public class Menu {
         System.out.println("\n Seleccione la categoria del gasto: ");
 
         //llamo al utilities encargado de imprimir las listas. Hecho para practicar generics.
-        PrintableList<ExpenseCategory> categoryPrinter = new Utilities<>();
+        Utilities<ExpenseCategory> categoryPrinter = new UtilitiesImpl<>();
         categoryPrinter.printList(expenseCategoryList);
 
         int catScan = scanner.nextInt() - 1;
@@ -62,7 +62,7 @@ public class Menu {
 
     public static void Option3(List<ExpenseCategory> expenseCategoryList) {
         //llamo al utilities encargado de imprimir las listas. Hecho para practicar generics.
-        PrintableList<ExpenseCategory> categoryPrinter = new Utilities<>();
+        Utilities<ExpenseCategory> categoryPrinter = new UtilitiesImpl<>();
         categoryPrinter.printList(expenseCategoryList);
         System.out.println(" ");
     }

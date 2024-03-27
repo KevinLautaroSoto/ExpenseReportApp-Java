@@ -1,7 +1,8 @@
 package interfaces;
 import java.util.List;
 
-@FunctionalInterface
-public interface PrintableList <T> {
+public interface Utilities<T> {
     void printList(List<T> list);
+
+    void consoleLoger (String str);
 }

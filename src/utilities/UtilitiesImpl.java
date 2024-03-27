@@ -1,14 +1,11 @@
 package utilities;
 
-import entities.Expense;
-import entities.ExpenseCategory;
 import entities.ExpenseCategoryDto;
 import entities.ExpenseDto;
-import interfaces.ExpenseCategoryDAO;
-import interfaces.PrintableList;
+
 import java.util.List;
 
-public class  Utilities<T> implements PrintableList<T> {
+public class UtilitiesImpl<T> implements interfaces.Utilities<T> {
     @Override
     public void printList(List<T> list) {
         for (T item : list) {
@@ -18,6 +15,11 @@ public class  Utilities<T> implements PrintableList<T> {
                 System.out.println(category.getId() + ": " + category.getName());
             }
         }
+    }
+
+    @Override
+    public void consoleLoger(String str) {
+        System.out.println(str);
     }
 }
 
