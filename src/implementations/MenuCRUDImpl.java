@@ -7,15 +7,14 @@ import entities.ExpenseCategoryDto;
 import entities.ExpenseDto;
 import interfaces.ExpenseCategoryDAO;
 import interfaces.ExpenseDAO;
-import interfaces.PrintableList;
+import interfaces.Utilities;
 import menu.MenuCRUD;
-import utilities.Utilities;
+import utilities.UtilitiesImpl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -30,7 +29,7 @@ public class MenuCRUDImpl implements MenuCRUD {
     //Lista de Gastos cargados en la base de datos.
     public void option1() {
         List<ExpenseDto> allExpenses = expenseDao.getAll();
-        PrintableList<ExpenseDto> expensePrinter = new Utilities<>();
+        Utilities<ExpenseDto> expensePrinter = new UtilitiesImpl<>();
         expensePrinter.printList(allExpenses);
     }
 
@@ -41,7 +40,7 @@ public class MenuCRUDImpl implements MenuCRUD {
 
         //Obtengo el index de la categoria del gasto.
         System.out.println("\n Seleccione la categoria del gasto: ");
-        PrintableList<ExpenseCategoryDto> categoryPrinter = new Utilities<>();
+        Utilities<ExpenseCategoryDto> categoryPrinter = new UtilitiesImpl<>();
         categoryPrinter.printList(expenseCatDAO.getAll());
 
         int catScan = scanner.nextInt();
@@ -92,7 +91,7 @@ public class MenuCRUDImpl implements MenuCRUD {
 
         System.out.println("El gasto a cambiar es: ");
 
-        PrintableList<ExpenseDto> expensePrinter = new Utilities<>();
+        Utilities<ExpenseDto> expensePrinter = new UtilitiesImpl<>();
         expensePrinter.printList(expenseDtosSearch);
 
 
@@ -100,7 +99,7 @@ public class MenuCRUDImpl implements MenuCRUD {
 
         //Obtengo el index de la categoria del gasto.
         System.out.println("\n Seleccione la categoria del gasto: ");
-        PrintableList<ExpenseCategoryDto> categoryPrinter = new Utilities<>();
+        Utilities<ExpenseCategoryDto> categoryPrinter = new UtilitiesImpl<>();
         categoryPrinter.printList(expenseCatDAO.getAll());
 
         int catScan = scanner.nextInt();
@@ -156,7 +155,7 @@ public class MenuCRUDImpl implements MenuCRUD {
     @Override
     //Lista de Categorias de Gastos.
     public void option5() {
-        PrintableList<ExpenseCategoryDto> categoryPrinter = new Utilities<>();
+        Utilities<ExpenseCategoryDto> categoryPrinter = new UtilitiesImpl<>();
         categoryPrinter.printList(expenseCatDAO.getAll());
         System.out.println(" ");
     }
@@ -186,7 +185,7 @@ public class MenuCRUDImpl implements MenuCRUD {
 
         ExpenseCategoryDto categoryFind = expenseSearchByName.getFirst();
         System.out.println("La categoria a modificar es: ");
-        PrintableList<ExpenseCategoryDto> printCategories = new Utilities<>();
+        Utilities<ExpenseCategoryDto> printCategories = new UtilitiesImpl<>();
         printCategories.printList(expenseSearchByName);
 
         System.out.println("Indique el nuevo nombre de la categoria: ");

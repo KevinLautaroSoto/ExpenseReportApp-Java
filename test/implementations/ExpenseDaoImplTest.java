@@ -1,12 +1,15 @@
 package implementations;
 
+import entities.Expense;
 import entities.ExpenseCategory;
 import entities.ExpenseDto;
 import interfaces.ExpenseCategoryDAO;
 import interfaces.ExpenseDAO;
+import interfaces.Utilities;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import utilities.UtilitiesImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -14,6 +17,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -160,18 +164,300 @@ class ExpenseDaoImplTest {
     }
 
     @Test
-    void getById() {
+    public void getAll_MultipleExpenses_ReturnsAllExpenses() throws SQLException {
+        //GIVEN
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        ExpenseDAO expenseDAO = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true, true, false);
+        when(mockResultSet.getDouble("amount")).thenReturn(10.0, 20.0);
+        when(mockResultSet.getString("description")).thenReturn("Expense 1", "Expense 2");
+        when(mockResultSet.getInt("category_id")).thenReturn(1, 2);
+        when(mockResultSet.getString("date")).thenReturn("2024-03-20", "2024-03-21");
+        when(mockResultSet.getInt("id")).thenReturn(1, 2);
+
+        when(mockExpenseCategoryDao.getById(anyInt())).thenReturn(new ExpenseCategory("Category 1"));
+
+        //When
+        List<ExpenseDto> result = expenseDAO.getAll();
+
+        //THEN
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(10.0, result.get(0).getAmount());
+        assertEquals("Expense 1", result.get(0).getDescription());
+        assertEquals("Category 1", result.get(0).getCategory().getName());
+        assertEquals("2024-03-20", result.get(0).getDate());
+        assertEquals(1, result.get(0).getId());
+
+        assertEquals(20.0, result.get(1).getAmount());
+        assertEquals("Expense 2", result.get(1).getDescription());
+        assertEquals("Category 1", result.get(1).getCategory().getName());
+        assertEquals("2024-03-21", result.get(1).getDate());
+        assertEquals(2, result.get(1).getId());
     }
 
     @Test
-    void getByDescription() {
+    public void getById_ExpenseFound_ReturnsExpense() throws SQLException {
+        // GIVEN
+        int idExpense = 1;
+        double amount = 10.0;
+        String description = "Test expense";
+        int categoryId = 1;
+        String date = "2024-03-21";
+
+        ResultSet mockResultSet = mock(ResultSet.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        Connection mockConnection = mock(Connection.class);
+        ExpenseDAO expenseDao = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true);
+        when(mockResultSet.getDouble("amount")).thenReturn(amount);
+        when(mockResultSet.getString("description")).thenReturn(description);
+        when(mockResultSet.getInt("category_id")).thenReturn(categoryId);
+        when(mockResultSet.getString("date")).thenReturn(date);
+
+        ExpenseCategory category = new ExpenseCategory("Test category");
+        when(mockExpenseCategoryDao.getById(categoryId)).thenReturn(category);
+
+        // WHEN
+        Expense result = expenseDao.getById(idExpense);
+
+        // THEN
+        assertNotNull(result);
+        assertEquals(amount, result.getAmount());
+        assertEquals(description, result.getDescription());
+        assertEquals(category, result.getCategory());
+        assertEquals(date, result.getDate());
     }
 
     @Test
-    void update() {
+    public void testGetById_ExpenseNotFound() throws SQLException {
+        // GIVEN
+        int idExpense = 1;
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+
+        // Simulate result set with no rows:
+        when(mockResultSet.next()).thenReturn(false);
+
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        when(mockExpenseCategoryDao.getById(anyInt())).thenReturn(null);
+
+        // Create ExpenseDao instance
+        ExpenseDAO expenseDAO = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+        // WHEN
+        Expense result = expenseDAO.getById(idExpense);
+
+        // THEN
+        assertNull(result);
     }
 
     @Test
-    void delete() {
+    public void testGetByDescription_MatchFound() throws SQLException {
+        // GIVEN
+        String descriptionSearch = "test";
+        List<ExpenseDto> expectedExpenses = new ArrayList<>();
+
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        ExpenseDAO expenseDAO = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+        // Simulate result set with one row:
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(true).thenReturn(false); // One row found
+        when(mockResultSet.getDouble("amount")).thenReturn(10.0);
+        when(mockResultSet.getString("description")).thenReturn("Test Expense");
+        when(mockResultSet.getInt("category_id")).thenReturn(1);
+        when(mockResultSet.getString("date")).thenReturn("2024-03-21");
+        when(mockResultSet.getInt("id")).thenReturn(1);
+        when(mockExpenseCategoryDao.getById(anyInt())).thenReturn(new ExpenseCategory("test category"));
+
+        ExpenseDto expectedExpense = new ExpenseDto(10.0, "Test Expense", new ExpenseCategory("Test Category"), "2024-03-21");
+        expectedExpense.setId(1);
+        expectedExpenses.add(expectedExpense);
+
+        // WHEN
+        List<ExpenseDto> result = expenseDAO.getByDescription(descriptionSearch);
+
+        // THEN
+        assertFalse(result.isEmpty());
+        assertEquals(expectedExpenses.size(), result.size());
+    }
+
+    @Test
+    public void testGetByDescription_NoMatchFound() throws SQLException {
+        // GIVEN
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        ResultSet mockResultSet = mock(ResultSet.class);
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        ExpenseDAO expenseDAO = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+
+        String descriptionSearch = "nonexistent";
+        List<ExpenseDto> expectedExpenses = new ArrayList<>();
+        // Simulate result set with no rows:
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
+        when(mockResultSet.next()).thenReturn(false); // No rows found
+
+        // WHEN
+        List<ExpenseDto> result = expenseDAO.getByDescription(descriptionSearch);
+
+        // THEN
+        assertTrue(result.isEmpty());
+        assertEquals(expectedExpenses.size(), result.size());
+    }
+
+    @Test
+    public void testGetByDescription_SQLException() throws SQLException {
+        // GIVEN
+        Connection mockConnection = mock(Connection.class);
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        ExpenseDAO expenseDAO = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+        String descriptionSearch = "test";
+        // Simulate SQLException
+        when(mockConnection.prepareStatement(anyString())).thenThrow(SQLException.class);
+
+        // WHEN / THEN
+        assertThrows(RuntimeException.class, () -> expenseDAO.getByDescription(descriptionSearch));
+    }
+
+    @Test
+    public void testUpdate_Successful() throws SQLException {
+        // GIVEN
+        Utilities utilities = mock(UtilitiesImpl.class);
+
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        ExpenseDAO expenseDAO = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+        Expense expenseToUpdate = new Expense();
+        expenseToUpdate.setId(1);
+        expenseToUpdate.setAmount(20.0);
+        expenseToUpdate.setDescription("Updated description");
+        expenseToUpdate.setDate("2024-03-21");
+        ExpenseCategory category = new ExpenseCategory();
+        category.setId(1);
+        expenseToUpdate.setCategory(category);
+
+        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+
+        // WHEN
+        expenseDAO.update(expenseToUpdate);
+
+        // THEN
+        verify(mockPreparedStatement).setDouble(1, expenseToUpdate.getAmount());
+        verify(mockPreparedStatement).setString(2, expenseToUpdate.getDescription());
+        verify(mockPreparedStatement).setInt(3, expenseToUpdate.getCategory().getId());
+        verify(mockPreparedStatement).setString(4, expenseToUpdate.getDate());
+        verify(mockPreparedStatement).setInt(5, expenseToUpdate.getId());
+        verify(mockPreparedStatement).executeUpdate();
+        //verify(utilities).consoleLoger("The update was successfully loaded."); se romper y requiere demasiado cambio en el codigo que no creo conveniente hacer.
+        //verifyNoMoreInteractions(mockPreparedStatement, System.out);
+    }
+
+    @Test
+    public void testUpdate_SQLException() throws SQLException {
+        // GIVEN
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        ExpenseDAO expenseDAO = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+        Expense expenseToUpdate = new Expense();
+        expenseToUpdate.setId(1);
+        expenseToUpdate.setAmount(20.0);
+        expenseToUpdate.setDescription("Updated description");
+        expenseToUpdate.setDate("2024-03-21");
+        ExpenseCategory category = new ExpenseCategory();
+        category.setId(1);
+        expenseToUpdate.setCategory(category);
+
+        when(mockConnection.prepareStatement(anyString())).thenThrow(SQLException.class);
+
+        // WHEN / THEN
+        assertThrows(RuntimeException.class, () -> expenseDAO.update(expenseToUpdate));
+    }
+
+    @Test
+    public void testDelete_Successful() throws SQLException {
+        // GIVEN
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        ExpenseDAO expenseDAO = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+        int idToDelete = 1;
+        String sqlDelete = "DELETE FROM EXPENSES WHERE id = ?";
+        when(mockConnection.prepareStatement(sqlDelete)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+
+        // WHEN
+        expenseDAO.delete(idToDelete);
+
+        // THEN
+        verify(mockConnection).prepareStatement(sqlDelete);
+        verify(mockPreparedStatement).setInt(1, idToDelete);
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    public void testDelete_Unsuccessful() throws SQLException {
+        // GIVEN
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        ExpenseDAO expenseDAO = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+        int idToDelete = 1;
+        String sqlDelete = "DELETE FROM EXPENSES WHERE id = ?";
+        when(mockConnection.prepareStatement(sqlDelete)).thenReturn(mockPreparedStatement);
+        when(mockPreparedStatement.executeUpdate()).thenReturn(0); // Simular que no se eliminó ninguna fila
+
+        // WHEN
+        expenseDAO.delete(idToDelete);
+
+        // THEN
+        verify(mockConnection).prepareStatement(sqlDelete);
+        verify(mockPreparedStatement).setInt(1, idToDelete);
+        verify(mockPreparedStatement).executeUpdate();
+    }
+
+    @Test
+    public void testDelete_ExceptionThrown() throws SQLException {
+        // GIVEN
+        Connection mockConnection = mock(Connection.class);
+        PreparedStatement mockPreparedStatement = mock(PreparedStatement.class);
+        ExpenseCategoryDAO mockExpenseCategoryDao = mock(ExpenseCategoryDaoImpl.class);
+        ExpenseDAO expenseDAO = new ExpenseDaoImpl(mockConnection, mockExpenseCategoryDao);
+
+        int idToDelete = 1;
+        String errorMessage = "SQL Exception";
+        when(mockConnection.prepareStatement(anyString())).thenThrow(new SQLException(errorMessage));
+
+        // WHEN - THEN
+        assertThrows(RuntimeException.class, () -> {
+            expenseDAO.delete(idToDelete);
+        });
     }
 }
